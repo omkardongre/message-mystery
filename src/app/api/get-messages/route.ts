@@ -18,26 +18,19 @@ export async function GET() {
   }
   const userId = new mongoose.Types.ObjectId(_user._id);
   try {
-    const user = await UserModel.aggregate([
+    const userMessages = await UserModel.aggregate([
       { $match: { _id: userId } },
-      { $unwind: "$messages" },
+      { $unwind: { path: "$messages", preserveNullAndEmptyArrays: true } },
       { $sort: { "messages.createdAt": -1 } },
       { $group: { _id: "$_id", messages: { $push: "$messages" } } },
     ]).exec();
 
-    if (!user || user.length === 0) {
-      return Response.json(
-        { message: "User not found", success: false },
-        { status: 404 }
-      );
-    }
+    const messages = userMessages[0]?.messages.filter(Boolean) || [];
 
-    return Response.json(
-      { messages: user[0].messages },
-      {
-        status: 200,
-      }
-    );
+    return Response.json({
+      messages,
+      success: true,
+    });
   } catch (error) {
     console.error("An unexpected error occurred:", error);
     return Response.json(

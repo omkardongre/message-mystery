@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/toaster";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import AuthProvider from "../context/AuthProvider";
@@ -17,9 +18,12 @@ interface RootLayoutProps {
 export default async function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
-      <AuthProvider>
-        <body className={inter.className}>{children}</body>
-      </AuthProvider>
+      <body className={inter.className}>
+        <AuthProvider>
+          {children}
+          <Toaster />
+        </AuthProvider>
+      </body>
     </html>
   );
 }
